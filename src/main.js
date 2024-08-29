@@ -1,6 +1,6 @@
 const Juejin = require('./juejin/index.js')
 const pushMessage = require('./utils/pushMessage.js')
-const { COOKIE } = require('./ENV.js')
+const { COOKIE,COOKIE1 } = require('./ENV.js')
 
 const growth = {
   userName: '', // 用户名
@@ -26,52 +26,57 @@ ${growth.checkedIn ? `签到 +${growth.incrPoint} 矿石` : '今日已签到'}
 累计签到天数 ${growth.sumCount}
 当前幸运值 ${growth.luckyValue}
 免费抽奖次数 ${growth.freeCount}
+COOKIE ${COOKIE}
+COOKIE1 ${COOKIE1}
 `.trim()
 }
 
 const main = async () => {
   const juejin = new Juejin()
+  for (let index = 0; index < 2; index++) {
+    let cookie = index == 0 ? COOKIE : COOKIE1
+    // 登录
+    try {
+      await juejin.login(cookie)
 
-  // 登录
-  try {
-    await juejin.login(COOKIE)
+      growth.userName = juejin.user.user_name
+    } catch {
+      throw new Error('登录失败, 请尝试更新 Cookies')
+    }
 
-    growth.userName = juejin.user.user_name
-  } catch {
-    throw new Error('登录失败, 请尝试更新 Cookies')
+    // 签到
+    const checkIn = await juejin.getTodayStatus()
+
+    if (!checkIn.check_in_done) {
+      const checkInResult = await juejin.checkIn()
+
+      growth.checkedIn = true
+      growth.incrPoint = checkInResult.incr_point
+    }
+
+    // 签到天数
+    const counts = await juejin.getCounts()
+
+    growth.contCount = counts.cont_count
+    growth.sumCount = counts.sum_count
+
+    // 免费抽奖
+    const lotteryConfig = await juejin.getLotteryConfig()
+    growth.freeCount = lotteryConfig.free_count || 0
+
+    // 当前矿石数
+    growth.sumPoint = await juejin.getCurrentPoint()
+
+    // 当前幸运值
+    const luckyResult = await juejin.getLucky()
+    growth.luckyValue = luckyResult.total_value
+
+    pushMessage({
+      type: 'info',
+      message: message(),
+    })
+
   }
-
-  // 签到
-  const checkIn = await juejin.getTodayStatus()
-
-  if (!checkIn.check_in_done) {
-    const checkInResult = await juejin.checkIn()
-
-    growth.checkedIn = true
-    growth.incrPoint = checkInResult.incr_point
-  }
-
-  // 签到天数
-  const counts = await juejin.getCounts()
-
-  growth.contCount = counts.cont_count
-  growth.sumCount = counts.sum_count
-
-  // 免费抽奖
-  const lotteryConfig = await juejin.getLotteryConfig()
-  growth.freeCount = lotteryConfig.free_count || 0
-
-  // 当前矿石数
-  growth.sumPoint = await juejin.getCurrentPoint()
-
-  // 当前幸运值
-  const luckyResult = await juejin.getLucky()
-  growth.luckyValue = luckyResult.total_value
-
-  pushMessage({
-    type: 'info',
-    message: message(),
-  })
 }
 
 main().catch(error => {
