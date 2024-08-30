@@ -1,6 +1,6 @@
 module.exports = {
   COOKIE: process.env.COOKIE,
-  COOKIE1: process.env.COOKIE1,
+  COOKIEA: process.env.COOKIEA,
   EMAIL: process.env.EMAIL,
   AUTHORIZATION_CODE: process.env.AUTHORIZATION_CODE,
   PUSHPLUS_TOKEN: process.env.PUSHPLUS_TOKEN,

@@ -1,6 +1,6 @@
 const Juejin = require('./juejin/index.js')
 const pushMessage = require('./utils/pushMessage.js')
-const { COOKIE,COOKIE1 } = require('./ENV.js')
+const { COOKIE,COOKIEA } = require('./ENV.js')
 
 const growth = {
   userName: '', // 用户名
@@ -11,7 +11,7 @@ const growth = {
   sumCount: 0, // 累计签到天数
   luckyValue: 0, // 总幸运值
   freeCount: 0, // 免费抽奖次数
-  freeDrawed: false, // 是否免费抽奖
+  freeDrawed: true, // 是否免费抽奖
   lotteryName: '', // 奖品名称
   collectedBug: false, // 是否收集 Bug
   collectBugCount: 0, // 收集 Bug 的数量
@@ -27,14 +27,14 @@ ${growth.checkedIn ? `签到 +${growth.incrPoint} 矿石` : '今日已签到'}
 当前幸运值 ${growth.luckyValue}
 免费抽奖次数 ${growth.freeCount}
 COOKIE ${COOKIE}
-COOKIE1 ${COOKIE1}
+COOKIE1 ${COOKIEA}
 `.trim()
 }
 
 const main = async () => {
   const juejin = new Juejin()
   for (let index = 0; index < 2; index++) {
-    let cookie = index == 0 ? COOKIE : COOKIE1
+    let cookie = index == 0 ? COOKIE : COOKIEA
     // 登录
     try {
       await juejin.login(cookie)
